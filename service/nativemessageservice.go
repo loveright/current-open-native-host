@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"notion-native/entity"
+	"notion-native/model/entity"
 	"os"
 	"os/exec"
 	"syscall"

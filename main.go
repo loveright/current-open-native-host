@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/atotto/clipboard"
+	"github.com/gin-gonic/gin"
 	"net/url"
+	"notion-native/config"
+	"notion-native/routers"
 	"notion-native/service"
 	"os"
 	"strings"
@@ -29,7 +32,15 @@ func main() {
 		return
 	}
 
-	service.NativeMessageService()
+	go service.NativeMessageService()
+
+	r := gin.Default()
+	routers.RegisterRouters(r)
+	err := r.Run(config.Port)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func isProtocolLaunch() bool {

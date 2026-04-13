@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/binary"
 	"encoding/json"
-	"notion-native/entity"
+	"notion-native/model/entity"
 	"os"
 	"os/exec"
 )
