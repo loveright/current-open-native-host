@@ -11,6 +11,7 @@ func loadV1(g *gin.RouterGroup) {
 
 	notion := apiV1.Group("/notion")
 	{
-		notion.POST("/calculate/hours", v1.CalculateHours)
+		notion.POST("/calculate/hours", v1.CalculateHoursPost)
+		notion.GET("/calculate/hours/:pageId/:orderId/:notionVersion", v1.CalculateHoursGet)
 	}
 }
