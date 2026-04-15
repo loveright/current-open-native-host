@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/atotto/clipboard"
-	"github.com/gin-gonic/gin"
+	"log"
 	"net"
 	"net/url"
 	"notion-native/config"
@@ -12,10 +11,17 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/atotto/clipboard"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println("args:", os.Args)
+	f, _ := os.OpenFile("native-debug.log",
+		os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+
+	log.SetOutput(f)
+	fmt.Fprintf(f, "args=%v\n", os.Args)
 	// ===== 1. 如果是 server 进程，只跑 HTTP =====
 	if isServerMode() {
 		startServer()
@@ -27,10 +33,10 @@ func main() {
 
 	// ===== 3. 如果服务没启动，就拉起子进程 =====
 	if !isPortInUse(config.Port) {
-		fmt.Println("启动子进程 server...")
+		fmt.Fprintln(os.Stderr, "启动子进程 server...")
 		startServerProcess()
 	} else {
-		fmt.Println("server 已存在")
+		fmt.Fprintln(os.Stderr, "server 已存在")
 	}
 
 }
@@ -87,11 +93,11 @@ func isServerMode() bool {
 func startServerProcess() {
 	exePath, err := os.Executable()
 	if err != nil {
-		fmt.Println("获取 exePath 失败:", err)
+		fmt.Fprintln(os.Stderr, "获取 exePath 失败:", err)
 		return
 	}
 
-	fmt.Println("exePath:", exePath)
+	fmt.Fprintln(os.Stderr, "exePath:", exePath)
 
 	cmd := exec.Command(exePath, "server")
 
@@ -103,21 +109,21 @@ func startServerProcess() {
 
 	err = cmd.Start()
 	if err != nil {
-		fmt.Println("启动子进程失败:", err)
+		fmt.Fprintln(os.Stderr, "启动子进程失败:", err)
 		return
 	}
 
-	fmt.Println("子进程 PID:", cmd.Process.Pid)
+	fmt.Fprintln(os.Stderr, "子进程 PID:", cmd.Process.Pid)
 }
 
 func startServer() {
-	fmt.Println("HTTP server 启动中...")
+	fmt.Fprintln(os.Stderr, "HTTP server 启动中...")
 	r := gin.Default()
 	routers.RegisterRouters(r)
 
 	err := r.Run(config.Port)
 	if err != nil {
-		fmt.Println("HTTP 启动失败:", err)
+		fmt.Fprintln(os.Stderr, "HTTP 启动失败:", err)
 		panic(err)
 	}
 }
@@ -148,5 +154,6 @@ func runOnceTask() bool {
 }
 
 func isNativeMessageLaunch() bool {
-	return len(os.Args) > 1 && os.Args[1] == "native"
+	fi, _ := os.Stdin.Stat()
+	return (fi.Mode() & os.ModeCharDevice) == 0
 }

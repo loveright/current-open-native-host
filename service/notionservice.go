@@ -5,6 +5,7 @@ import (
 	"notion-native/config"
 	"notion-native/model/entity"
 	"notion-native/utils"
+	"os"
 	"strconv"
 )
 
@@ -29,10 +30,10 @@ func getDataSourceId(pageId, nodeVersion string) string {
 	token := config.GetNotionToken()
 	page, err := utils.HttpRequest[entity.NotionPage]("GET", url, token, nodeVersion, nil)
 	if err != nil {
-		fmt.Println("error:", err)
+		fmt.Fprintln(os.Stderr, "error:", err)
 		return ""
 	}
-	fmt.Println("data_source_id:", page.Parent.DataSourceID)
+	fmt.Fprintln(os.Stderr, "data_source_id:", page.Parent.DataSourceID)
 	if page.Parent.DataSourceID != "" {
 		return page.Parent.DataSourceID
 	}
@@ -80,6 +81,6 @@ func getDataSources(dataSourceId, orderId, notionVersion string) (int, error) {
 		}
 	}
 
-	fmt.Println("总工时:", total)
+	fmt.Fprintln(os.Stderr, "总工时:", total)
 	return total, nil
 }

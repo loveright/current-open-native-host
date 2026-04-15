@@ -1,0 +1,1 @@
+go build -o current-native-host.exe
