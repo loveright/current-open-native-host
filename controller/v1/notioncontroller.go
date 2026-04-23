@@ -48,7 +48,7 @@ func CalculateHoursGet(r *gin.Context) {
 	data["total"] = total
 	if err != nil {
 		r.JSON(200, gin.H{
-			"status":  401,
+			"status":  400,
 			"message": "系统错误",
 		})
 	} else {

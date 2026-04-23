@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func CalculateHours(pageId, orderId, notionVersion string) (int, error) {
+func CalculateHours(pageId, orderId, notionVersion string) (float64, error) {
 	dataSourceId := getDataSourceId(pageId, notionVersion)
 
 	if dataSourceId == "" {
@@ -40,7 +40,7 @@ func getDataSourceId(pageId, nodeVersion string) string {
 	return ""
 }
 
-func getDataSources(dataSourceId, orderId, notionVersion string) (int, error) {
+func getDataSources(dataSourceId, orderId, notionVersion string) (float64, error) {
 
 	url := fmt.Sprintf("https://api.notion.com/v1/data_sources/%s/query", dataSourceId)
 	token := config.GetNotionToken()
@@ -65,13 +65,13 @@ func getDataSources(dataSourceId, orderId, notionVersion string) (int, error) {
 		return 0, err
 	}
 
-	total := 0
+	total := 0.0
 
 	for _, page := range dataSources.Results {
 		if prop, ok := page.Properties["工时"]; ok {
 			for _, item := range prop.MultiSelect {
 
-				val, err := strconv.Atoi(item.Name)
+				val, err := strconv.ParseFloat(item.Name, 64)
 				if err != nil {
 					continue
 				}
